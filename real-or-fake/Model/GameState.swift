@@ -1,13 +1,29 @@
 import SwiftUI
 
 class GameState: ObservableObject {
-    @Published var score: Int = 0
-    @Published var streak: Int = 0
-    private var elo: Int = 1000
+    @Published var score: Int = 0 {
+        didSet {
+            saveState()
+        }
+    }
+    @Published var streak: Int = 0 {
+        didSet {
+            saveState()
+        }
+    }
+    private var elo: Int = 1000 {
+        didSet {
+            saveState()
+        }
+    }
 
     private let basePoints = 100
     private let streakMultiplier = 0.2
     private let eloK = 32
+
+    init() {
+        loadState()
+    }
 
     func processGuess(isCorrect: Bool, cardDifficulty: Double = 0.5) {
         if isCorrect {
@@ -32,6 +48,7 @@ class GameState: ObservableObject {
     }
 
     func loadState() {
+        print("loading state", score, elo)
         score = UserDefaults.standard.integer(forKey: "userScore")
         elo = UserDefaults.standard.integer(forKey: "userElo")
     }

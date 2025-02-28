@@ -28,7 +28,6 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.1), value: backgroundColor)
 
             VStack {
-                // Score display
                 HStack {
                     Text("Score: \(gameState.score)")
                         .font(.title2)
@@ -69,7 +68,6 @@ struct ContentView: View {
         correctGuess = isCorrect
         backgroundColor = isCorrect ? Color.green : Color.red
         
-        // Process the guess with GameState
         gameState.processGuess(isCorrect: isCorrect)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
