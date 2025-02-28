@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var gameState = GameState()
     // TODO: replace with images from db in the future
     @State private var cards = [
         Card(id: UUID(), isReal: false),
@@ -27,20 +28,26 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.1), value: backgroundColor)
 
             VStack {
+                // Score display
                 HStack {
-                    Text("← Fake")
-                        .font(.title)
+                    Text("Score: \(gameState.score)")
+                        .font(.title2)
                         .bold()
-                        .foregroundColor(.gray)
-                        .opacity(0.4)
-                        .padding(.leading, 20)
+                        .padding()
                     Spacer()
-                    Text("Real →")
-                        .font(.title)
-                        .bold()
-                        .foregroundColor(.gray)
-                        .opacity(0.4)
-                        .padding(.trailing, 20)
+                    if gameState.streak > 1 {
+                        Text("Streak: \(gameState.streak)")
+                            .font(.title2)
+                            .bold()
+                            .foregroundColor(.orange)
+                            .padding()
+                    }
+                }
+
+                HStack {
+                    DirectionLabel(text: "Fake", alignment: .leading)
+                    Spacer()
+                    DirectionLabel(text: "Real", alignment: .trailing)
                 }
 
                 ZStack {
@@ -61,6 +68,9 @@ struct ContentView: View {
         let isCorrect = card.isReal == userGuessedReal
         correctGuess = isCorrect
         backgroundColor = isCorrect ? Color.green : Color.red
+        
+        // Process the guess with GameState
+        gameState.processGuess(isCorrect: isCorrect)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             backgroundColor = .white
@@ -69,6 +79,20 @@ struct ContentView: View {
                 cards.removeAll { $0.id == card.id }
             }
         }
+    }
+}
+
+struct DirectionLabel: View {
+    let text: String
+    let alignment: HorizontalAlignment
+    
+    var body: some View {
+        Text(alignment == .leading ? "← \(text)" : "\(text) →")
+            .font(.title)
+            .bold()
+            .foregroundColor(.gray)
+            .opacity(0.4)
+            .padding(alignment == .leading ? .leading : .trailing, 20)
     }
 }
 
